@@ -22,9 +22,10 @@
     - Неверный формат файла (jpg, png) - пропуск файла;
 
 """
+import time
 from urllib.parse import urljoin
 
-import backoff
+# import backoff
 from dateutil.parser import parse
 import requests
 from lxml import html
@@ -32,10 +33,10 @@ from lxml import html
 from config import API_URL
 
 
-@backoff.on_exception(backoff.expo,
-                      (requests.exceptions.RequestException,
-                       requests.exceptions.Timeout),
-                      max_tries=5)
+# @backoff.on_exception(backoff.expo,
+#                       (requests.exceptions.RequestException,
+#                        requests.exceptions.Timeout),
+#                       max_tries=5)
 def request(method, url, **kwargs):
     """ Отправка реквеста с использованием backoff. До 4-х попыток отправить
     запрос повторно при возникновении requests.RequestException.
@@ -132,24 +133,29 @@ class TrinixyParser:
         tags = tree.xpath('//div[contains(@class, "arttags")]/a/text()')
         gifs_urls = tree.xpath('//div[@itemprop="articleBody"]//img/@src')
 
-        for gif_url in gifs_urls:
+        # for gif_url in gifs_urls:
 
             # check extension
-            extension = gif_url.split('.')[-1]
-            if extension != 'gif':
-                self.skipped_items += 1
-                continue
-
-            # get_source_date
-            source_date = get_source_date(gif_url)
-
-            # send gif to db
-            create_gif(gif_url, description, source_date)
+            # extension = gif_url.split('.')[-1]
+            # if extension != 'gif':
+            #     self.skipped_items += 1
+            #     continue
+            #
+            # # get_source_date
+            # source_date = get_source_date(gif_url)
+            #
+            # # send gif to db
+            # create_gif(gif_url, description, source_date)
 
             # # create tags
             # for tag in tags:
 
 
 if __name__ == '__main__':
+    time_start = time.time()
+
     parser = TrinixyParser()
     parser.run()
+
+    time_end = time.time() - time_start
+    print(f'time {time_end}')
